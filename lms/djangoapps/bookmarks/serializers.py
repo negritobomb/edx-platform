@@ -15,7 +15,8 @@ class BookmarkSerializer(serializers.ModelSerializer):
     course_id = serializers.Field(source='course_key')
     usage_id = serializers.Field(source='usage_key')
     block_type = serializers.Field(source='usage_key.block_type')
-    path = serializers.Field(source='path')
+    display_name = serializers.Field(source='display_name')
+    path = serializers.Field(source='updated_path')
 
     def __init__(self, *args, **kwargs):
         # Don't pass the 'fields' arg up to the superclass
