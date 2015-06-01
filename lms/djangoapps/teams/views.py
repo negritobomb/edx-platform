@@ -3,6 +3,7 @@ View methods for the course team feature.
 """
 
 from django.shortcuts import render_to_response
+from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import CourseKey
 from courseware.courses import get_course_with_access, has_access
 from django.http import Http404
@@ -33,7 +34,16 @@ class TeamsDashboardView(View):
                 not has_access(request.user, 'staff', course, course.id):
             raise Http404
 
-        context = {"course": course}
+        context = {
+            "course": course,
+            "header_info": {
+                "description": _(
+                    "Course teams are organized into topics created by course instructors. Try"
+                    " to join others in an existing team before you decide to create a new team!"
+                ),
+                "title": _("Teams")
+            }
+        }
         return render_to_response("teams/teams.html", context)
 
 
