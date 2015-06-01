@@ -1,6 +1,6 @@
 <header class="page-header has-secondary">
   <div class="header-main">
-    <% if (breadcrumbs !== null) { %>
+    <% if (breadcrumbs !== null && breadcrumbs.length > 0) { %>
     <nav class="breadcrumbs">
       <% _.each(breadcrumbs, function (breadcrumb) { %>
         <a class="nav-item" href="<%= breadcrumb.url %>"><%- breadcrumb.title %></a>
