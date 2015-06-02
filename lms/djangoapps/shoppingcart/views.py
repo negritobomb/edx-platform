@@ -899,6 +899,7 @@ def _show_receipt_html(request, order):
                     'course_name': course.display_name,
                     'redemption_url': reverse('register_code_redemption', args=[course_registration_code.code]),
                     'code': course_registration_code.code,
+                    'is_valid': course_registration_code.is_valid,
                     'is_redeemed': RegistrationCodeRedemption.objects.filter(
                         registration_code=course_registration_code).exists(),
                 })
