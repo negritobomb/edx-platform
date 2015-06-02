@@ -6,7 +6,7 @@ from celery.task import task
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from xmodule.modulestore.django import modulestore
 
-from .models import XBlockCache
+from .models import XBlockCache, PathItem
 
 log = logging.getLogger('edx.celery.task')
 
@@ -59,36 +59,41 @@ def _calculate_course_xblocks_data(course_key):
     return blocks_info_dict
 
 
-def _required_paths_data(paths):
-
-    paths_data = []
-    for path in paths:
-        paths_data.append(
-            [{'usage_id': unicode(node['usage_key']), 'display_name': node['display_name']} for node in path]
+def _paths_from_data(paths_data):
+    """
+    Construct a list of paths from path data.
+    """
+    paths = []
+    for path_data in paths_data:
+        paths.append(
+            [PathItem(item['usage_key'], item['display_name']) for item in path_data]
         )
-    return paths_data
+    return paths
+
 
 def _update_xblocks_cache(course_key):
-
+    """
+    Calculate the XBlock cache data for a course and update the XBlockCache table.
+    """
     blocks_data = _calculate_course_xblocks_data(course_key)
 
     with transaction.commit_on_success():
         block_caches = XBlockCache.objects.filter(course_key=course_key)
         for block_cache in block_caches:
             block_data = blocks_data.pop(unicode(block_cache.usage_key))
-            paths_data = _required_paths_data(block_data['paths'])
+            paths = _paths_from_data(block_data['paths'])
             if block_cache.display_name != block_data['display_name'] or block_cache.paths != paths_data:
                 block_cache.display_name = block_data['display_name']
-                block_cache.paths = paths_data
+                block_cache.paths = paths
                 block_cache.save()
 
     for block_data in blocks_data.values():
         with transaction.commit_on_success():
-            paths_data = _required_paths_data(block_data['paths'])
+            paths = _paths_from_data(block_data['paths'])
             block_cache, created = XBlockCache.objects.get_or_create(usage_key=block_data['usage_key'], defaults={
                 'course_key': course_key,
                 'display_name': block_data['display_name'],
-                'paths': paths_data,
+                'paths': paths,
             })
 
             if not created:
@@ -101,7 +106,10 @@ def _update_xblocks_cache(course_key):
 @task(name=u'lms.djangoapps.bookmarks.tasks.update_xblock_cache')
 def update_xblocks_cache(course_id):
     """
-    Updates the XBlocks cache for a course.
+    Update the XBlocks cache for a course.
+
+    Arguments:
+        course_id (String): The course_id of a course.
     """
     # Ideally we'd like to accept a CourseLocator; however, CourseLocator is not JSON-serializable (by default) so
     # Celery's delayed tasks fail to start. For this reason, callers should pass the course key as a Unicode string.
