@@ -9,7 +9,7 @@ from django.http import Http404
 from rest_framework.exceptions import PermissionDenied
 
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.locator import CourseKey
 
 from courseware.courses import get_course_with_access
 from discussion_api.forms import ThreadCreateExtrasForm
@@ -54,7 +54,7 @@ def _get_thread_and_context(request, thread_id, parent_id=None, retrieve_kwargs=
         if "mark_as_read" not in retrieve_kwargs:
             retrieve_kwargs["mark_as_read"] = False
         cc_thread = Thread(id=thread_id).retrieve(**retrieve_kwargs)
-        course_key = CourseLocator.from_string(cc_thread["course_id"])
+        course_key = CourseKey.from_string(cc_thread["course_id"])
         course = _get_course_or_404(course_key, request.user)
         context = get_context(course, request, cc_thread, parent_id)
         if not context["is_requester_privileged"] and cc_thread["group_id"]:
@@ -257,7 +257,7 @@ def create_thread(request, thread_data):
     if not course_id:
         raise ValidationError({"course_id": ["This field is required."]})
     try:
-        course_key = CourseLocator.from_string(course_id)
+        course_key = CourseKey.from_string(course_id)
         course = _get_course_or_404(course_key, request.user)
     except (Http404, InvalidKeyError):
         raise ValidationError({"course_id": ["Invalid value."]})
