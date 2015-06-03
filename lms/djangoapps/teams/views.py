@@ -224,6 +224,7 @@ class TeamsListView(GenericAPIView):
             course_id_string = request.QUERY_PARAMS['course_id']
             try:
                 course_key = CourseKey.from_string(course_id_string)
+                # Ensure the course exists
                 get_course(course_key)
                 result_filter.update({'course_id': course_key})
             except InvalidKeyError:
@@ -289,6 +290,7 @@ class TeamsListView(GenericAPIView):
         course_id = request.DATA.get('course_id')
         try:
             course_key = CourseKey.from_string(course_id)
+            # Ensure the course exists
             get_course(course_key)
         except InvalidKeyError:
             field_errors['course_id'] = {
@@ -482,6 +484,7 @@ class TopicListView(GenericAPIView):
         except InvalidKeyError:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+        # Ensure the course exists
         course_module = modulestore().get_course(course_id)
         if course_module is None:  # course is None if not found
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -552,6 +555,7 @@ class TopicDetailView(APIView):
         except InvalidKeyError:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+        # Ensure the course exists
         course_module = modulestore().get_course(course_id)
         if course_module is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
