@@ -2,7 +2,7 @@
 E-commerce Tab Instructor Dashboard Query Registration Code Status.
 """
 from django.core.urlresolvers import reverse
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 from instructor.enrollment import get_email_params, send_mail_to_student
 from django.utils.translation import ugettext as _
 from courseware.courses import get_course_by_id
@@ -19,14 +19,14 @@ log = logging.getLogger(__name__)
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-@require_POST
+@require_GET
 def look_up_registration_code(request, course_id):  # pylint: disable=unused-argument
     """
     Look for the registration_code in the database.
     and check if it is still valid, allowed to redeem or not.
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    code = request.POST.get('registration_code')
+    code = request.GET.get('registration_code')
     course = get_course_by_id(course_key, depth=0)
     try:
         registration_code = CourseRegistrationCode.objects.get(code=code)

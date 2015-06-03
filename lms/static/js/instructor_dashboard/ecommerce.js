@@ -59,7 +59,6 @@ var edx = edx || {};
         });
         $lookup_button.click(function () {
             $registration_code_status_form_error.hide();
-
             $lookup_button.attr('disabled', true);
             var url = $(this).data('endpoint');
             var lookup_registration_code = $('#set_regcode_status_form input[name="regcode_code"]').val();
@@ -70,7 +69,7 @@ var edx = edx || {};
                 return false;
             }
             $.ajax({
-                type: "POST",
+                type: "GET",
                 data: {
                     "registration_code"  : lookup_registration_code
                 },

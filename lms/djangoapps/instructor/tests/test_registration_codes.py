@@ -86,7 +86,7 @@ class TestCourseRegistrationCodeStatus(ModuleStoreTestCase):
         data = {
             'registration_code': 'invalid_reg_code'
         }
-        response = self.client.post(self.lookup_code_url, data)
+        response = self.client.get(self.lookup_code_url, data)
         self.assertEqual(response.status_code, 400)
         json_dict = json.loads(response.content)
         message = _('The enrollment code ({code}) was not found for the {course_name} course.').format(
@@ -129,7 +129,7 @@ class TestCourseRegistrationCodeStatus(ModuleStoreTestCase):
         data = {
             'registration_code': reg_code.code
         }
-        response = self.client.post(self.lookup_code_url, data)
+        response = self.client.get(self.lookup_code_url, data)
         self.assertEqual(response.status_code, 200)
         json_dict = json.loads(response.content)
         self.assertTrue(json_dict['is_registration_code_valid'])
@@ -186,7 +186,7 @@ class TestCourseRegistrationCodeStatus(ModuleStoreTestCase):
         data = {
             'registration_code': reg_code.code
         }
-        response = self.client.post(self.lookup_code_url, data)
+        response = self.client.get(self.lookup_code_url, data)
         self.assertEqual(response.status_code, 200)
         json_dict = json.loads(response.content)
         self.assertTrue(json_dict['is_registration_code_valid'])
