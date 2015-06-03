@@ -342,7 +342,8 @@ class BookmarksListViewTests(BookmarksViewTestsMixin):
     @patch('lms.djangoapps.bookmarks.views.tracker.emit')
     def test_listed_event_for_different_page_size_values(self, page_size, expected_values, mock_tracker):
         """ Test that edx.course.bookmark.listed event values are as expected for different page size values """
-        query_parameters = 'course_id={}&page_size={}'.format(self.course_id, page_size)
+        query_parameters = 'course_id={}&page_size={}'.format(urllib.quote(self.course_id), page_size)
+
         self.send_get(client=self.client, url=reverse('bookmarks'), query_parameters=query_parameters)
 
         self.assert_bookmark_listed_event_emitted(

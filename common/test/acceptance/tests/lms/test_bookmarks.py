@@ -294,7 +294,7 @@ class BookmarksTest(BookmarksTestMixin):
         self.bookmarks_page.click_bookmarks_button()
         self.assertTrue(self.bookmarks_page.results_present())
         self.assertEqual(self.bookmarks_page.count(), 11)
-        
+
     def test_bookmarked_unit_accessed_event(self):
         """
         Scenario: Bookmark events are emitted with correct data when we access/visit a bookmarked unit.
