@@ -58,13 +58,13 @@ var edx = edx || {};
            });
         });
         $lookup_button.click(function () {
-            $registration_code_status_form_error.attr('style', 'display: none');
+            $registration_code_status_form_error.hide();
 
             $lookup_button.attr('disabled', true);
             var url = $(this).data('endpoint');
             var lookup_registration_code = $('#set_regcode_status_form input[name="regcode_code"]').val();
             if (lookup_registration_code == '') {
-                $registration_code_status_form_error.attr('style', 'display: block !important');
+                $registration_code_status_form_error.show();
                 $registration_code_status_form_error.text(gettext('Enter the enrollment code.'));
                 $lookup_button.removeAttr('disabled');
                 return false;
@@ -81,8 +81,8 @@ var edx = edx || {};
                     var is_registration_code_exists = data.is_registration_code_exists;
                     $lookup_button.removeAttr('disabled');
                     if (is_registration_code_exists == 'false') {
-                        $registration_code_status_form_error.attr('style', 'display: none');
-                        $registration_code_status_form_error.attr('style', 'display: block !important');
+                        $registration_code_status_form_error.hide();
+                        $registration_code_status_form_error.show();
                         $registration_code_status_form_error.text(gettext(data.message));
                     }
                     else {
@@ -147,10 +147,9 @@ var edx = edx || {};
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     var data = $.parseJSON(jqXHR.responseText);
-                    $registration_code_status_form_error.attr('style', 'display: none');
                     $lookup_button.removeAttr('disabled');
-                    $registration_code_status_form_error.attr('style', 'display: block !important');
                     $registration_code_status_form_error.text(gettext(data.message));
+                    $registration_code_status_form_error.show();
                 }
             });
         });
@@ -171,22 +170,17 @@ var edx = edx || {};
                 success: function (data) {
                     $('#set_regcode_status_form input[name="regcode_code"]').val('');
                     $registration_code_status_form.next().remove();
-                    $registration_code_status_form_error.attr('style', 'display: none');
-                    $registration_code_status_form_success.attr('style', 'display: none');
+                    $registration_code_status_form_error.hide();
                     $lookup_button.removeAttr('disabled');
-                    $registration_code_status_form_success.attr('style', 'display: block !important');
                     $registration_code_status_form_success.text(gettext(data.message));
-                    $registration_code_status_form_success.fadeOut(4000 , function(){
-                        $registration_code_status_form_success.attr('style', 'display: none');
-                        $registration_code_status_form_success.text('');
-                        $registration_code_status_form_success.hide();
-                    });
+                    $registration_code_status_form_success.show();
+                    $registration_code_status_form_success.fadeOut(3000);
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     var data = $.parseJSON(jqXHR.responseText);
-                    $registration_code_status_form_error.attr('style', 'display: none');
+                    $registration_code_status_form_error.hide();
                     $lookup_button.removeAttr('disabled');
-                    $registration_code_status_form_error.attr('style', 'display: block !important');
+                    $registration_code_status_form_error.show();
                     $registration_code_status_form_error.text(gettext(data.message));
                 }
             });
