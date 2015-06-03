@@ -659,18 +659,32 @@ class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 FORUM_ROLE_STUDENT,
             ],
             [True, False],
+            [True, False],
             ["no_group", "match_group", "different_group"],
         )
     )
     @ddt.unpack
-    def test_group_access(self, role_name, course_is_cohorted, thread_group_state):
-        cohort_course = CourseFactory.create(cohort_config={"cohorted": course_is_cohorted})
+    def test_group_access(
+            self,
+            role_name,
+            course_is_cohorted,
+            topic_is_cohorted,
+            thread_group_state
+    ):
+        cohort_course = CourseFactory.create(
+            discussion_topics={"Test Topic": {"id": "test_topic"}},
+            cohort_config={
+                "cohorted": course_is_cohorted,
+                "cohorted_discussions": ["test_topic"] if topic_is_cohorted else [],
+            }
+        )
         CourseEnrollmentFactory.create(user=self.user, course_id=cohort_course.id)
         cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.user])
         role = Role.objects.create(name=role_name, course_id=cohort_course.id)
         role.users = [self.user]
         thread = self.make_minimal_cs_thread({
             "course_id": unicode(cohort_course.id),
+            "commentable_id": "test_topic",
             "group_id": (
                 None if thread_group_state == "no_group" else
                 cohort.id if thread_group_state == "match_group" else
@@ -680,6 +694,7 @@ class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
         expected_error = (
             role_name == FORUM_ROLE_STUDENT and
             course_is_cohorted and
+            topic_is_cohorted and
             thread_group_state == "different_group"
         )
         try:

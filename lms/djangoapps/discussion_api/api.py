@@ -25,7 +25,7 @@ from django_comment_client.base.views import (
 from django_comment_client.utils import get_accessible_discussion_modules
 from lms.lib.comment_client.thread import Thread
 from lms.lib.comment_client.utils import CommentClientRequestError
-from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id
+from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, is_commentable_cohorted
 from xmodule.tabs import DiscussionTab
 
 
@@ -57,7 +57,11 @@ def _get_thread_and_context(request, thread_id, parent_id=None, retrieve_kwargs=
         course_key = CourseKey.from_string(cc_thread["course_id"])
         course = _get_course_or_404(course_key, request.user)
         context = get_context(course, request, cc_thread, parent_id)
-        if not context["is_requester_privileged"] and cc_thread["group_id"]:
+        if (
+                not context["is_requester_privileged"] and
+                cc_thread["group_id"] and
+                is_commentable_cohorted(course.id, cc_thread["commentable_id"])
+        ):
             requester_cohort = get_cohort_id(request.user, course.id)
             if requester_cohort is not None and cc_thread["group_id"] != requester_cohort:
                 raise Http404
