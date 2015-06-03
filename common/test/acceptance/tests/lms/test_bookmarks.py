@@ -89,7 +89,7 @@ class BookmarksTest(BookmarksTestMixin):
             index: unit index to bookmark
         """
         self.course_nav.go_to_section('TestSection{}'.format(index), 'TestSubsection{}'.format(index))
-        self.bookmarks_page.click_bookmark_unit_button()
+        self.courseware_page.click_bookmark_unit_button()
 
     def _bookmark_units(self, num_units):
         """
@@ -149,10 +149,10 @@ class BookmarksTest(BookmarksTestMixin):
         """
         Bookmark a single unit and then verify
         """
-        self.assertTrue(self.bookmarks_page.bookmark_button_visible)
-        self.bookmarks_page.click_bookmark_unit_button()
-        self.assertEqual(self.bookmarks_page.bookmark_icon_visible, bookmark_icon_state)
-        self.assertEqual(self.bookmarks_page.bookmark_button_state, bookmark_button_state)
+        self.assertTrue(self.courseware_page.bookmark_button_visible)
+        self.courseware_page.click_bookmark_unit_button()
+        self.assertEqual(self.courseware_page.bookmark_icon_visible, bookmark_icon_state)
+        self.assertEqual(self.courseware_page.bookmark_button_state, bookmark_button_state)
         self.bookmarks_page.click_bookmarks_button()
         self.assertEqual(self.bookmarks_page.count(), bookmarked_count)
 
