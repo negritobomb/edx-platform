@@ -157,7 +157,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         self.course = self.courses[0]
 
     @override_settings(CERT_QUEUE='test-queue')
-    @patch('certificates.management.commands.regenerate_user.XQueueCertInterface', spec=True)
+    @patch('certificates.api.XQueueCertInterface', spec=True)
     def test_clear_badge(self, xqueue):
         """
         Given that I have a user with a badge
@@ -174,6 +174,27 @@ class RegenerateCertificatesTest(CertificateManagementTest):
             grade_value=None
         )
         xqueue.return_value.regen_cert.assert_called_with(
-            self.user, key, course=self.course, forced_grade=None, template_file=None
+            self.user, key, self.course, None, None, True
         )
         self.assertFalse(BadgeAssertion.objects.filter(user=self.user, course_id=key))
+
+    @override_settings(CERT_QUEUE='test-queue')
+    @patch('capa.xqueue_interface.XQueueInterface.send_to_queue', spec=True)
+    def test_regenerating_certificate(self, mock_send_to_queue):
+        """
+        Given that I have a user who has not passed course
+        If I run regeneration for that user
+        Then certificate generation will be not be requested
+        """
+        key = self.course.location.course_key
+        self._create_cert(key, self.user, CertificateStatuses.downloadable)
+        self._run_command(
+            username=self.user.email, course=unicode(key), noop=False, insecure=True, template_file=None,
+            grade_value=None
+        )
+        certificate = GeneratedCertificate.objects.get(
+            user=self.user,
+            course_id=key
+        )
+        self.assertEqual(certificate.status, CertificateStatuses.notpassing)
+        self.assertFalse(mock_send_to_queue.called)
