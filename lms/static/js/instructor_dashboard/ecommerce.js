@@ -117,31 +117,24 @@ var edx = edx || {};
                                 }
                             );
                         }
-
-                        for ( var i = 0; i < actions.length; i++ ) {
-                            actions_links += '<a class="registration_code_action_link" data-registration-code="'+
-                            actions[i]["registration_code"] +'" data-action-type="'+ actions[i]["action_type"] +'"' +
-                            ' href="#" data-endpoint="' + actions[i]["action_url"] +'">' +
-                            actions[i]["action_name"] + '</a>';
-                        }
                         is_registration_code_redeemed = is_registration_code_redeemed ? 'Yes' : 'No';
                         is_registration_code_valid = is_registration_code_valid ? 'Yes' : 'No';
-
-                        var registration_code_lookup_actions = $('<table width="100%" class="tb_registration_code_status">' +
-                            '<thead> <th width="15%">' + gettext('Code') + '</th> <th width="20%">'+ gettext('Used') + '</th>'+
-                            '<th width="14%">' + gettext('Valid') + '</th> <th>' + gettext('Actions') + '</th></thead><tbody><tr>'+
-                            '<td>' + lookup_registration_code + '</td>' +
-                            '<td>' + is_registration_code_redeemed +'</td>' +
-                            '<td>' + is_registration_code_valid + '</td><td>' +
-                            actions_links +
-                            '</td></tr> </tbody> </table>'
+                        // load the underscore template.
+                        var template_data = _.template($('#enrollment-code-lookup-links-tpl').text());
+                        var registration_code_lookup_actions = template_data(
+                            {
+                                lookup_registration_code: lookup_registration_code,
+                                is_registration_code_redeemed: is_registration_code_redeemed,
+                                is_registration_code_valid: is_registration_code_valid,
+                                actions: actions
+                            }
                         );
+
                         // before insertAfter do this.
                         // remove the first element after the registration_code_status_form
                         // so it doesn't duplicate the registration_code_lookup_actions in the UI.
                         $registration_code_status_form.next().remove();
-
-                        registration_code_lookup_actions.insertAfter($registration_code_status_form);
+                        $(registration_code_lookup_actions).insertAfter($registration_code_status_form);
                     }
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
