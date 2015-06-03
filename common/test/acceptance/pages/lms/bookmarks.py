@@ -69,17 +69,17 @@ class BookmarksPage(CoursePage):
         return True
 
     @property
-    def bookmark_button_bookmarked(self):
-        """ Return `bookmarked` if button is in bookmarked state else `un-bookmarked` """
-        return 'bookmarked' if self.q(css='.bookmark-button.bookmarked').present else 'un-bookmarked'
+    def bookmark_button_state(self):
+        """ Return `bookmarked` if button is in bookmarked state else '' """
+        return 'bookmarked' if self.q(css='.bookmark-button.bookmarked').present else ''
 
     @property
     def bookmark_icon_visible(self):
-        """ Check if bookmark icon is visible on sequence item """
-        return self.q(css='.bookmark-icon').visible
+        """ Check if bookmark icon is visible on active sequence nav item """
+        return self.q(css='.active .bookmark-icon').visible
 
     def click_bookmark_unit_button(self):
-        """ Bookmark an unit by clicking on Bookmark button """
-        previous_state = self.bookmark_button_bookmarked
+        """ Bookmark a unit by clicking on Bookmark button """
+        previous_state = self.bookmark_button_state
         self.q(css='.bookmark-button').first.click()
-        EmptyPromise(lambda: self.bookmark_button_bookmarked != previous_state, "Bookmarked button toggled").fulfill()
+        EmptyPromise(lambda: self.bookmark_button_state != previous_state, "Bookmark button toggled").fulfill()

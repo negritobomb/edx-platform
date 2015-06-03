@@ -132,7 +132,7 @@
 i.bookmarked {
   top: -3px;
   position: absolute;
-  left: 10px;
+  left: ($baseline/4);
 }
 
 
@@ -176,7 +176,7 @@ i.bookmarked {
   @include hover-style($light-gray, $black, "\f097");
 }
 
-.bookmark-button.un-bookmarked {
+.bookmark-button:not(.bookmarked) {
   @include base-style($light-gray, $black);
   @include icon-style("\f097", $black);
   @include hover-style($m-blue, $m-blue, "\f02e");

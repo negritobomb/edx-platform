@@ -34,7 +34,7 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
                     expect(view.$el.find('.bookmark-sr').text()).toBe('Click to remove');
                 } else {
                     expect(view.$el).toHaveAttr('aria-pressed', 'false');
-                    expect(view.$el).toHaveClass('un-bookmarked');
+                    expect(view.$el).not.toHaveClass('bookmarked');
                     expect(view.$el.find('.bookmark-sr').text()).toBe('Click to add');
                 }
                 expect(view.$el.data('bookmarkId')).toBe('bilbo,usage_1');

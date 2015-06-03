@@ -436,7 +436,6 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             'studio_url': studio_url,
             'masquerade': masquerade,
             'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
-            'reverifications': fetch_reverify_banner_info(request, course_key),
             'bookmarks_api_url': bookmarks_api_url,
             'language_preference': language_preference,
         }

@@ -20,19 +20,7 @@
                 this.bookmarkId = options.bookmarkId;
                 this.bookmarked = options.bookmarked;
                 this.usageId = options.usageId;
-                this.initializeBookmarkState();
-            },
-
-            initializeBookmarkState: function() {
-                if (this.bookmarked) {
-                    this.$el.addClass("bookmarked").removeClass("un-bookmarked");
-                    this.$el.find('.bookmark-sr').text(this.srRemoveBookmarkText);
-                    this.$el.attr('aria-pressed', 'true');
-                } else {
-                    this.$el.find('.bookmark-sr').text(this.srAddBookmarkText);
-                    this.$el.addClass("un-bookmarked").removeClass("bookmarked");
-                    this.$el.attr('aria-pressed', 'false');
-                }
+                this.setBookmarkState(this.bookmarked);
             },
 
             toggleBookmark: function(event) {
@@ -54,9 +42,7 @@
                     dataType: 'json',
                     success: function () {
                         view.$el.trigger('bookmark:add');
-                        view.$el.removeClass('un-bookmarked').addClass('bookmarked');
-                        view.$el.attr('aria-pressed', 'true');
-                        view.$el.find('.bookmark-sr').text(view.srRemoveBookmarkText);
+                        view.setBookmarkState(true);
                     },
                     error: function() {
                         view.showError();
@@ -73,14 +59,24 @@
                     url: deleteUrl,
                     success: function () {
                         view.$el.trigger('bookmark:remove');
-                        view.$el.removeClass('bookmarked').addClass('un-bookmarked');
-                        view.$el.attr('aria-pressed', 'false');
-                        view.$el.find('.bookmark-sr').text(view.srAddBookmarkText);
+                        view.setBookmarkState(false);
                     },
                     error: function() {
                         view.showError();
                     }
                 });
+            },
+
+            setBookmarkState: function(bookmarked) {
+                if (bookmarked) {
+                    this.$el.addClass('bookmarked');
+                    this.$el.attr('aria-pressed', 'true');
+                    this.$el.find('.bookmark-sr').text(this.srRemoveBookmarkText);
+                } else {
+                    this.$el.removeClass('bookmarked');
+                    this.$el.attr('aria-pressed', 'false');
+                    this.$el.find('.bookmark-sr').text(this.srAddBookmarkText);
+                }
             },
 
             showError: function() {

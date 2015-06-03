@@ -26,7 +26,7 @@ class BookmarksTestMixin(EventsTestMixin, UniqueCourseTest):
         Create course fixture
 
         Arguments:
-            num_chpaters: number of chapters to create
+            num_chapters: number of chapters to create
         """
         self.course_fixture = CourseFixture(  # pylint: disable=attribute-defined-outside-init
             self.course_info['org'], self.course_info['number'],
@@ -103,7 +103,7 @@ class BookmarksTest(BookmarksTestMixin):
 
     def _breadcrumb(self, num_units):
         """
-        Create breadcrumbs.
+        Creates breadcrumbs for the first `num_units`
 
         Arguments:
             num_units(int): Number of units for which we want to create breadcrumbs
@@ -145,14 +145,14 @@ class BookmarksTest(BookmarksTestMixin):
         self.courseware_page.visit()
         self.courseware_page.wait_for_page()
 
-    def _verify_bookmark(self, bookmark_icon_state, bookmark_button_state, bookmarked_count):
+    def _toggle_bookmark_and_verify(self, bookmark_icon_state, bookmark_button_state, bookmarked_count):
         """
         Bookmark a single unit and then verify
         """
         self.assertTrue(self.bookmarks_page.bookmark_button_visible)
         self.bookmarks_page.click_bookmark_unit_button()
         self.assertEqual(self.bookmarks_page.bookmark_icon_visible, bookmark_icon_state)
-        self.assertEqual(self.bookmarks_page.bookmark_button_bookmarked, bookmark_button_state)
+        self.assertEqual(self.bookmarks_page.bookmark_button_state, bookmark_button_state)
         self.bookmarks_page.click_bookmarks_button()
         self.assertEqual(self.bookmarks_page.count(), bookmarked_count)
 
@@ -174,9 +174,9 @@ class BookmarksTest(BookmarksTestMixin):
         for index in range(2):
             self.course_nav.go_to_section('TestSection{}'.format(index), 'TestSubsection{}'.format(index))
 
-            self._verify_bookmark(True, 'bookmarked', 1)
+            self._toggle_bookmark_and_verify(True, 'bookmarked', 1)
             self.bookmarks_page.click_bookmarks_button(False)
-            self._verify_bookmark(False, 'un-bookmarked', 0)
+            self._toggle_bookmark_and_verify(False, '', 0)
 
     def test_empty_bookmarks_list(self):
         """
