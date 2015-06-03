@@ -237,6 +237,19 @@ if settings.WIKI_ENABLED:
     )
 
 if settings.COURSEWARE_ENABLED:
+    course_urls = patterns(
+        '',
+        url(
+            r'^look_up_registration_code$',
+            'instructor.views.registration_codes.look_up_registration_code',
+            name='look_up_registration_code'
+        ),
+        url(
+            r'^registration_code_details$',
+            'instructor.views.registration_codes.registration_code_details',
+            name='registration_code_details'
+        )
+    )
     urlpatterns += (
         url(r'^courses/{}/jump_to/(?P<location>.*)$'.format(settings.COURSE_ID_PATTERN),
             'courseware.views.jump_to', name="jump_to"),
@@ -361,6 +374,12 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/{}/registration_code_details$'.format(settings.COURSE_ID_PATTERN),
             'instructor.views.registration_codes.registration_code_details', name="registration_code_details"),
 
+        # course_urls = patterns('',
+        #     url(r'^look_up_registration_code$', 'instructor.views.registration_codes.look_up_registration_code', name='look_up_registration_code'),
+        #     url(r'^registration_code_details$', 'instructor.views.registration_codes.registration_code_details', name='registration_code_details')
+        # )
+
+        url(r'^courses/{}/'.format(settings.COURSE_ID_PATTERN), include(course_urls)),
         # see ENABLE_INSTRUCTOR_LEGACY_DASHBOARD section for legacy dash urls
 
         # Open Ended grading views

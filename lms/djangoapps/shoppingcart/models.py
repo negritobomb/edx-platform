@@ -1169,16 +1169,6 @@ class CourseRegistrationCode(models.Model):
     invoice = models.ForeignKey(Invoice, null=True)
     invoice_item = models.ForeignKey(CourseRegistrationCodeInvoiceItem, null=True)
 
-    @classmethod
-    def get_registration_code(cls, code, course_id):
-        """
-        returns the registration code object if found else returns None.
-        """
-        try:
-            return cls.objects.get(code=code, course_id=course_id)
-        except cls.DoesNotExist:
-            return None
-
 
 class RegistrationCodeRedemption(models.Model):
     """

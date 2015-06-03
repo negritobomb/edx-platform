@@ -26,9 +26,6 @@ class TestCourseRegistrationCodeStatus(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        """
-        Fixtures.
-        """
         super(TestCourseRegistrationCodeStatus, self).setUp()
         self.course = CourseFactory.create()
         CourseModeFactory.create(course_id=self.course.id, min_price=50)
@@ -58,19 +55,33 @@ class TestCourseRegistrationCodeStatus(ModuleStoreTestCase):
                       kwargs={'course_id': self.course.id.to_deprecated_string()})
 
         data = {
-            'total_registration_codes': 12, 'company_name': 'Test Group', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'unit_price': 122.45, 'recipient_name': 'Test123',
-            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street',
-            'address_line_2': '', 'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
-            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
+            'total_registration_codes': 12,
+            'company_name': 'Test Group',
+            'company_contact_name': 'Test@company.com',
+            'company_contact_email': 'Test@company.com',
+            'unit_price': 122.45,
+            'recipient_name': 'Test123',
+            'recipient_email': 'test@123.com',
+            'address_line_1': 'Portland Street',
+            'address_line_2': '',
+            'address_line_3': '',
+            'city': '',
+            'state': '',
+            'zip': '',
+            'country': '',
+            'customer_reference_number': '123A23F',
+            'internal_reference': '',
+            'invoice': ''
         }
 
-        response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
+        response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200, response.content)
 
     def test_look_up_invalid_registration_code(self):
         """
-        test lookup for the invalid registration code
+        Verify the view returns HTTP status 400 if an invalid registration code is passed.
+        Also, verify the data returned includes a message indicating the error,
+        and the is_registration_code_valid is set to False.
         """
         data = {
             'registration_code': 'invalid_reg_code'
@@ -98,7 +109,7 @@ class TestCourseRegistrationCodeStatus(ModuleStoreTestCase):
         for i in range(2):
             CourseRegistrationCode.objects.create(
                 code='reg_code{}'.format(i),
-                course_id=self.course.id.to_deprecated_string(),
+                course_id=unicode(self.course.id),
                 created_by=self.instructor,
                 invoice=self.sale_invoice,
                 invoice_item=self.invoice_item,
@@ -133,11 +144,11 @@ class TestCourseRegistrationCodeStatus(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
         json_dict = json.loads(response.content)
-        message = _('Action type {action_type} is a success.').format(action_type=data['action_type'])
+        message = _('This enrollment code has been canceled. It can no longer be used.')
         self.assertEqual(message, json_dict['message'])
 
         # now check that the registration code should be marked as invalid in the db.
-        reg_code = CourseRegistrationCode.get_registration_code(reg_code.code, self.course.id)
+        reg_code = CourseRegistrationCode.objects.get(code=reg_code.code)
         self.assertEqual(reg_code.is_valid, False)
 
         redemption = RegistrationCodeRedemption.get_registration_code_redemption(reg_code.code, self.course.id)
@@ -193,7 +204,7 @@ class TestCourseRegistrationCodeStatus(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
         json_dict = json.loads(response.content)
-        message = _('Action type {action_type} is a success.').format(action_type=data['action_type'])
+        message = _('This enrollment code has been marked as unused.')
         self.assertEqual(message, json_dict['message'])
 
         redemption = RegistrationCodeRedemption.get_registration_code_redemption(reg_code.code, self.course.id)
@@ -246,11 +257,11 @@ class TestCourseRegistrationCodeStatus(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
         json_dict = json.loads(response.content)
-        message = _('Action type {action_type} is a success.').format(action_type=data['action_type'])
+        message = _('The enrollment code has been restored.')
         self.assertEqual(message, json_dict['message'])
 
         # now check that the registration code should be marked as valid in the db.
-        reg_code = CourseRegistrationCode.get_registration_code(reg_code.code, self.course.id)
+        reg_code = CourseRegistrationCode.objects.get(code=reg_code.code)
         self.assertEqual(reg_code.is_valid, True)
 
     def test_returns_error_when_unredeeming_already_unredeemed_registration_code_redemption(self):

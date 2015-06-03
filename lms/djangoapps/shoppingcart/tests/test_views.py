@@ -403,8 +403,8 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
         self.assertEqual(resp.status_code, 400)
         self.assertIn(
-            "The registration code '{registration_code}' is not longer valid.".format(
-                registration_code=self.reg_code), resp.content)
+            "This enrollment code ({enrollment_code}) is no longer valid.".format(
+                enrollment_code=self.reg_code), resp.content)
 
     def test_course_does_not_exist_in_cart_against_valid_reg_code(self):
         course_key = self.course_key.to_deprecated_string() + 'testing'
@@ -544,7 +544,6 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
             self.assertEqual(coupon.is_active, False)
 
     def test_course_free_discount_for_valid_active_reg_code(self):
-
         self.add_reg_code(self.course_key)
         self.add_course_to_user_cart(self.course_key)
 
@@ -565,7 +564,9 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         # the item has been removed when using the registration code for the first time
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
         self.assertEqual(resp.status_code, 400)
-        self.assertIn("Oops! The code '{0}' you entered is either invalid or expired".format(self.reg_code), resp.content)
+        self.assertIn("This enrollment code ({enrollment_code}) is not valid.".format(
+            enrollment_code=self.reg_code
+        ), resp.content)
 
     def test_upgrade_from_valid_reg_code(self):
         """Use a valid registration code to upgrade from honor to verified mode. """

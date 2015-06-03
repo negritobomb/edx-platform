@@ -433,18 +433,18 @@ def use_registration_code(course_reg, user):
     and redirects the user to the Registration code redemption page.
     """
     if not course_reg.is_valid:
-        log.warning(u"The registration code '%s' is no longer valid.", course_reg.code)
+        log.warning(u"The enrollment code (%s) is no longer valid.", course_reg.code)
         return HttpResponseBadRequest(
-            _("The registration code '{registration_code}' is not longer valid.").format(
-                registration_code=course_reg.code
+            _("This enrollment code ({enrollment_code}) is no longer valid.").format(
+                enrollment_code=course_reg.code
             )
         )
 
     if RegistrationCodeRedemption.is_registration_code_redeemed(course_reg.code):
-        log.warning(u"Registration code '%s' already used", course_reg.code)
+        log.warning(u"This enrollment code ({%s}) has already been used.", course_reg.code)
         return HttpResponseBadRequest(
-            _("Oops! The code '{registration_code}' you entered is either invalid or expired").format(
-                registration_code=course_reg.code
+            _("This enrollment code ({enrollment_code}) is not valid.").format(
+                enrollment_code=course_reg.code
             )
         )
     try:

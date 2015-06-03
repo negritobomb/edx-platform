@@ -28,8 +28,9 @@ def look_up_registration_code(request, course_id):  # pylint: disable=unused-arg
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     code = request.POST.get('registration_code')
     course = get_course_by_id(course_key, depth=0)
-    registration_code = CourseRegistrationCode.get_registration_code(code, course_key)
-    if registration_code is None:
+    try:
+        registration_code = CourseRegistrationCode.objects.get(code=code)
+    except CourseRegistrationCode.DoesNotExist:
         return JsonResponse({
             'is_registration_code_exists': False,
             'is_registration_code_valid': False,
@@ -41,7 +42,7 @@ def look_up_registration_code(request, course_id):  # pylint: disable=unused-arg
 
     reg_code_already_redeemed = RegistrationCodeRedemption.is_registration_code_redeemed(code)
 
-    registration_code_detail_url = reverse('registration_code_details', kwargs={'course_id': unicode(course_id)}),
+    registration_code_detail_url = reverse('registration_code_details', kwargs={'course_id': unicode(course_id)})
 
     return JsonResponse({
         'is_registration_code_exists': True,
@@ -66,12 +67,19 @@ def registration_code_details(request, course_id):
     code = request.POST.get('registration_code')
     action_type = request.POST.get('action_type')
     course = get_course_by_id(course_key, depth=0)
-    registration_code = CourseRegistrationCode.get_registration_code(code, course_key)
-    if registration_code is None:
+    action_type_messages = {
+        'invalidate_registration_code': _('This enrollment code has been canceled. It can no longer be used.'),
+        'unredeem_registration_code': _('This enrollment code has been marked as unused.'),
+        'validate_registration_code': _('The enrollment code has been restored.')
+    }
+    try:
+        registration_code = CourseRegistrationCode.objects.get(code=code)
+    except CourseRegistrationCode.DoesNotExist:
         return JsonResponse({
             'message': _('The enrollment code ({code}) was not found for the {course_name} course.').format(
                 code=code, course_name=course.display_name
             )}, status=400)
+
     if action_type == 'invalidate_registration_code':
         registration_code.is_valid = False
         registration_code.save()
@@ -92,18 +100,19 @@ def registration_code_details(request, course_id):
 
         delete_redemption_entry(request, code_redemption, course_key)
 
-    return JsonResponse({'message': _('Action type {action_type} is a success.').format(action_type=action_type)})
+    return JsonResponse({'message': action_type_messages[action_type]})
 
 
 def delete_redemption_entry(request, code_redemption, course_key):
     """
     delete the redemption entry from the table and
-    unenroll the user who have used the registration code
+    unenroll the user who used the registration code
     for the enrollment and send him/her the unenrollment email.
     """
+    user = code_redemption.redeemed_by
     email_address = code_redemption.redeemed_by.email
     full_name = code_redemption.redeemed_by.profile.name
-    CourseEnrollment.unenroll_by_email(email=email_address, course_id=course_key)
+    CourseEnrollment.unenroll(user, course_key, skip_refund=True)
 
     course = get_course_by_id(course_key, depth=0)
     email_params = get_email_params(course, True, secure=request.is_secure())
