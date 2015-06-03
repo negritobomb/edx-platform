@@ -75,9 +75,10 @@ var edx = edx || {};
                 },
                 url: url,
                 success: function (data) {
-                    var is_registration_code_valid = data.is_registration_code_valid;
-                    var is_registration_code_redeemed = data.is_registration_code_redeemed;
-                    var is_registration_code_exists = data.is_registration_code_exists;
+                    var is_registration_code_valid = data.is_registration_code_valid,
+                    is_registration_code_redeemed = data.is_registration_code_redeemed,
+                    is_registration_code_exists = data.is_registration_code_exists;
+
                     $lookup_button.removeAttr('disabled');
                     if (is_registration_code_exists == 'false') {
                         $registration_code_status_form_error.hide();
