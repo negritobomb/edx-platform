@@ -57,10 +57,6 @@ var edx = edx || {};
              }
            });
         });
-
-        String.prototype.capitalizeFirstLetter = function() {
-            return this.charAt(0).toUpperCase() + this.slice(1);
-        };
         $lookup_button.click(function () {
             $registration_code_status_form_error.attr('style', 'display: none');
 

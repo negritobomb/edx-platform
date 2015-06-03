@@ -237,7 +237,7 @@ if settings.WIKI_ENABLED:
     )
 
 if settings.COURSEWARE_ENABLED:
-    course_urls = patterns(
+    COURSE_URLS = patterns(
         '',
         url(
             r'^look_up_registration_code$',
@@ -369,17 +369,8 @@ if settings.COURSEWARE_ENABLED:
             'instructor.views.coupons.update_coupon', name="update_coupon"),
         url(r'^courses/{}/get_coupon_info$'.format(settings.COURSE_ID_PATTERN),
             'instructor.views.coupons.get_coupon_info', name="get_coupon_info"),
-        url(r'^courses/{}/look_up_registration_code$'.format(settings.COURSE_ID_PATTERN),
-            'instructor.views.registration_codes.look_up_registration_code', name="look_up_registration_code"),
-        url(r'^courses/{}/registration_code_details$'.format(settings.COURSE_ID_PATTERN),
-            'instructor.views.registration_codes.registration_code_details', name="registration_code_details"),
 
-        # course_urls = patterns('',
-        #     url(r'^look_up_registration_code$', 'instructor.views.registration_codes.look_up_registration_code', name='look_up_registration_code'),
-        #     url(r'^registration_code_details$', 'instructor.views.registration_codes.registration_code_details', name='registration_code_details')
-        # )
-
-        url(r'^courses/{}/'.format(settings.COURSE_ID_PATTERN), include(course_urls)),
+        url(r'^courses/{}/'.format(settings.COURSE_ID_PATTERN), include(COURSE_URLS)),
         # see ENABLE_INSTRUCTOR_LEGACY_DASHBOARD section for legacy dash urls
 
         # Open Ended grading views

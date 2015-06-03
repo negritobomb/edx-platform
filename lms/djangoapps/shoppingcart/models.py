@@ -1211,7 +1211,7 @@ class RegistrationCodeRedemption(models.Model):
         return code_redemption
 
     @classmethod
-    def create_invoice_generated_registration_redemption(cls, course_reg_code, user):
+    def create_invoice_generated_registration_redemption(cls, course_reg_code, user):  # pylint: disable=invalid-name
         """
         This function creates a RegistrationCodeRedemption entry in case the registration codes were invoice generated
         and thus the order_id is missing.
