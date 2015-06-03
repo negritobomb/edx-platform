@@ -67,14 +67,13 @@ def build_run_request(authenticated=True):
     return request
 
 
-class LtiLaunchTest(TestCase):
+class LtiTestMixin(object):
     """
-    Tests for the lti_launch view
+    Mixin for LTI tests
     """
-
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_LTI_PROVIDER': True})
     def setUp(self):
-        super(LtiLaunchTest, self).setUp()
+        super(LtiTestMixin, self).setUp()
         # Always accept the OAuth signature
         SignatureValidator.verify = MagicMock(return_value=True)
         self.consumer = models.LtiConsumer(
@@ -84,6 +83,11 @@ class LtiLaunchTest(TestCase):
         )
         self.consumer.save()
 
+
+class LtiLaunchTest(LtiTestMixin, TestCase):
+    """
+    Tests for the lti_launch view
+    """
     @patch('lti_provider.views.render_xblock')
     def test_valid_launch(self, render):
         """
@@ -93,7 +97,7 @@ class LtiLaunchTest(TestCase):
         views.lti_launch(request, unicode(COURSE_KEY), unicode(USAGE_KEY))
         render.assert_called_with(request, unicode(ALL_PARAMS['usage_key']))
 
-    @patch('lti_provider.views.render_courseware')
+    @patch('lti_provider.views.render_xblock')
     @patch('lti_provider.views.store_outcome_parameters')
     def test_outcome_service_registered(self, store_params, _render):
         """
@@ -201,19 +205,10 @@ class LtiLaunchTest(TestCase):
         self.assertEqual(response.status_code, 403)
 
 
-class LtiRunTest(TestCase):
+class LtiRunTest(LtiTestMixin, TestCase):
     """
     Tests for the lti_run view
     """
-    def setUp(self):
-        super(LtiRunTest, self).setUp()
-        consumer = models.LtiConsumer(
-            consumer_name='consumer',
-            consumer_key=LTI_DEFAULT_PARAMS['oauth_consumer_key'],
-            consumer_secret='secret'
-        )
-        consumer.save()
-
     @patch('lti_provider.views.render_xblock')
     def test_valid_launch(self, render):
         """
@@ -260,16 +255,12 @@ class LtiRunTest(TestCase):
         self.assertNotIn(views.LTI_SESSION_KEY, request.session)
 
 
-class LtiRunTestRender(RenderXBlockTestMixin, ModuleStoreTestCase):
+class LtiRunTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCase):
     """
     Tests for the rendering returned by lti_run view.
     This class overrides the get_response method, which is used by
     the tests defined in RenderXBlockTestMixin.
     """
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_LTI_PROVIDER': True})
-    def setUp(self):
-        super(LtiRunTestRender, self).setUp()
-
     def get_response(self):
         """
         Overridable method to get the response from the endpoint that is being tested.
