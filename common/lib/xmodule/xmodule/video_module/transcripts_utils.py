@@ -113,11 +113,10 @@ def transcript_name_youtube_video(youtube_text_api):
         # get all transcripts information from youtube server stored in track variable
         if youtube_data['transcript_list']:
             transcript_info_list = youtube_data['transcript_list'].get('track', [{'@lang_code': ''}])
-            # search specific language code such as 'en' in transcripts info
-            # pylint: disable=deprecated-lambda
-            transcript_data_found = filter(lambda trs: trs['@lang_code'] == lang, transcript_info_list)
-            if transcript_data_found:
-                transcript_name = transcript_data_found[0].get('@name', None)
+            # search specific language code such as 'en' in transcripts info list
+            for transcript_info in transcript_info_list:
+                if transcript_info['@lang_code'] == lang:
+                    return transcript_info.get('@name', None)
     return transcript_name
 
 
@@ -144,7 +143,7 @@ def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_
     data = requests.get('http://' + youtube_text_api['url'], params=youtube_text_api['params'])
 
     # Re-attempt to get transcript with name param in url from youtube server
-    if data.status_code == 200 and not data.text:
+    if data.status_code == 200 and not data.text and 'name' not in youtube_text_api['params'].keys():
         transcript_name_youtube_server = transcript_name_youtube_video(youtube_text_api)
         if transcript_name_youtube_server:
             return get_transcripts_from_youtube(youtube_id, settings, i18n, transcript_name_youtube_server)
