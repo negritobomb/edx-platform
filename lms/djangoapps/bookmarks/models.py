@@ -46,8 +46,7 @@ class Bookmark(TimeStampedModel):
         bookmark_data['path'] = cls.get_path(block)
         user = bookmark_data.pop('user')
 
-        bookmark, __ = cls.objects.get_or_create(usage_key=usage_key, user=user, defaults=bookmark_data)
-        return bookmark
+        return cls.objects.get_or_create(usage_key=usage_key, user=user, defaults=bookmark_data)
 
     @staticmethod
     def get_path(block):

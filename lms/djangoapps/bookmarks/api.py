@@ -68,11 +68,12 @@ def create_bookmark(user, usage_key):
     Raises:
         ItemNotFoundError: If no block exists for the usage_key.
     """
-    bookmark = Bookmark.create({
+    bookmark, created = Bookmark.create({
         'user': user,
         'usage_key': usage_key
     })
-    _track_event('edx.course.bookmark.added', bookmark)
+    if created:
+        _track_event('edx.course.bookmark.added', bookmark)
     return BookmarkSerializer(bookmark, context={'fields': DEFAULT_FIELDS + OPTIONAL_FIELDS}).data
 
 

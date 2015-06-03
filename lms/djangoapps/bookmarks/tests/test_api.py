@@ -173,11 +173,13 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, ModuleStoreTestCase):
 
         self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 2)
 
+        self.reset_tracker()
+
         bookmark_data_2 = api.create_bookmark(user=self.user, usage_key=self.vertical_1.location)
         self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 2)
         self.assertEqual(bookmark_data, bookmark_data_2)
 
-        self.assert_bookmark_event_emitted('edx.course.bookmark.added', bookmark_data_2['id'], self.vertical_1.location)
+        self.assert_no_events_were_emitted()
 
     def test_create_bookmark_raises_error(self):
         """
