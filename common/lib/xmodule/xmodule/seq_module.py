@@ -49,9 +49,10 @@ class SequenceFields(object):
     )
 
 
+# pylint: disable=abstract-method
 @XBlock.needs("user")
 @XBlock.needs("bookmarks")
-class SequenceModule(SequenceFields, XModule):  # pylint: disable=abstract-method
+class SequenceModule(SequenceFields, XModule):
     """
     Layout module which lays out content in a temporal sequence
     """
