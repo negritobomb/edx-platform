@@ -1793,4 +1793,9 @@ class LanguageProficiency(models.Model):
         unique_together = (('code', 'user_profile'),)
 
     user_profile = models.ForeignKey(UserProfile, db_index=True, related_name='language_proficiencies')
-    code = LanguageField(blank=False)
+    code = models.CharField(
+        max_length=16,
+        blank=False,
+        choices=settings.ALL_LANGUAGES,
+        help_text=_("The ISO 639-1 language code for this language.")
+    )
