@@ -62,13 +62,15 @@
             },
 
             visitBookmark: function (event) {
-                var bookmark_id = $(event.currentTarget).data('bookmarkId');
-                var component_usage_id = $(event.currentTarget).data('usageId');
+                var bookmarkedComponent = $(event.currentTarget);
+                var bookmark_id = bookmarkedComponent.data('bookmarkId');
+                var component_usage_id = bookmarkedComponent.data('usageId');
+                var component_type = bookmarkedComponent.data('componentType');
                 Logger.log(
                     'edx.course.bookmark.accessed',
                     {
                        bookmark_id: bookmark_id,
-                       component_type: 'vertical',
+                       component_type: component_type,
                        component_usage_id: component_usage_id
                     }
                 ).always(function () {

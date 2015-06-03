@@ -39,6 +39,7 @@ define(['backbone', 'jquery', 'underscore', 'logger', 'js/common_helpers/ajax_he
                         created: new Date().toISOString(),
                         course_id: 'COURSE_ID',
                         usage_id: 'UNIT_USAGE_ID_' + i,
+                        block_type: 'vertical',
                         path: [
                             {display_name: 'SECTION_DISAPLAY_NAME', usage_id: 'SECTION_USAGE_ID'},
                             {display_name: 'SUBSECTION_DISAPLAY_NAME', usage_id: 'SUBSECTION_USAGE_ID'}
@@ -68,17 +69,21 @@ define(['backbone', 'jquery', 'underscore', 'logger', 'js/common_helpers/ajax_he
 
                 expect(bookmarks.length, results.length);
 
-                for(var b = 0; b < results.length; b++) {
-                    courseId = results[b].course_id;
-                    usageId = results[b].usage_id;
+                for(var bookmark = 0; bookmark < results.length; bookmark++) {
+                    courseId = results[bookmark].course_id;
+                    usageId = results[bookmark].usage_id;
 
-                    expect(bookmarks[b]).toHaveAttr('href', createBookmarkUrl(courseId, usageId));
+                    expect(bookmarks[bookmark]).toHaveAttr('href', createBookmarkUrl(courseId, usageId));
 
-                    expect($(bookmarks[b]).find('.list-item-breadcrumbtrail').html().trim()).
-                        toBe(breadcrumbTrail(results[b].path, results[b].display_name));
+                    expect($(bookmarks[bookmark]).data('bookmarkId')).toBe(bookmark);
+                    expect($(bookmarks[bookmark]).data('componentType')).toBe('vertical');
+                    expect($(bookmarks[bookmark]).data('usageId')).toBe(usageId);
 
-                    expect($(bookmarks[b]).find('.list-item-date').text().trim()).
-                        toBe('Bookmarked on ' + view.humanFriendlyDate(results[b].created));
+                    expect($(bookmarks[bookmark]).find('.list-item-breadcrumbtrail').html().trim()).
+                        toBe(breadcrumbTrail(results[bookmark].path, results[bookmark].display_name));
+
+                    expect($(bookmarks[bookmark]).find('.list-item-date').text().trim()).
+                        toBe('Bookmarked on ' + view.humanFriendlyDate(results[bookmark].created));
                 }
             };
 
